@@ -1,0 +1,41 @@
+{
+<<<<<<< HEAD
+  "name": "meapedgeclient",
+=======
+  "name": "src",
+>>>>>>> 80140a20e882a46801af3e3c61ef369c244fb463
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+<<<<<<< HEAD
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts"
+=======
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> 80140a20e882a46801af3e3c61ef369c244fb463
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+<<<<<<< HEAD
+    "mongoose": "^8.13.2",
+=======
+    "mongoose": "^8.13.1",
+>>>>>>> 80140a20e882a46801af3e3c61ef369c244fb463
+    "node-opcua": "^2.150.0"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^22.14.0",
+    "ts-node": "^10.9.2",
+<<<<<<< HEAD
+    "typescript": "^5.8.3"
+=======
+    "typescript": "^5.8.2"
+>>>>>>> 80140a20e882a46801af3e3c61ef369c244fb463
+  }
+}
