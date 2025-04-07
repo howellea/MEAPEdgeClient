@@ -1,14 +1,12 @@
 {
   "name": "meapedgeclient",
   "version": "1.0.0",
-  "description": "OPC UA Simulator and OPC UA client for the MEAP Application",
-  "main": "index.js",
- "scripts": {
-  "build": "tsc",
-  "start": "node dist/server.js",
-  "watch": "nodemon dist/server.js",
-  "dev": "nodemon --watch src --exec ts-node src/server.ts"
-},
+  "description": "OPC UA Simulator and Edge Client for the MEAP Application",
+  "scripts": {
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node -r dotenv/config dist/server.js"
+  },
   "keywords": [],
   "author": "Eddy Howell",
   "license": "MIT",
