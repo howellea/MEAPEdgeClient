@@ -15,7 +15,7 @@ import {
   import Reading from '../models/readings';
   
   // URL for the Prosys OPC UA Simulation Server
-  const endpointUrl = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+  const endpointUrl = "opc.tcp://eddys-MBP.attlocal.net:53530/OPCUA/SimulationServer";
   
   // Function to connect and continuously poll OPC UA tags
   export const pollOpcUaTags = async () => {
