@@ -1,26 +1,43 @@
-// This defines how each sensor reading will be stored in MongoDB.
+// This defines how each equipment reading is structured in MongoDB
 import mongoose from 'mongoose';
 
-// Define a schema for storing equipment sensor data
+// Define a schema for storing sensor data from equipment
 const readingSchema = new mongoose.Schema({
-  // Each reading is tied to a specific equipment (e.g., Pump-101)
-  equipmentId: { type: String, required: true },
+  // Identifies which equipment this reading is from (e.g., Pump-101)
+  equipmentId: {
+    type: String,
+    required: true
+  },
 
-  // Timestamp defaults to now when saved
-  timestamp: { type: Date, default: Date.now },
+  // Automatically saves the current date/time
+  timestamp: {
+    type: Date,
+    default: Date.now
+  },
 
-  // Tags represent the various sensor measurements
+  // Sensor data captured at the time of the reading
   tags: {
-    temperature: Number,     // Simulated temperature value
-    flowRate: Number,        // Simulated flow rate
-    motorStatus: String,     // Running, Stopped, Faulted, etc.
-    vibration: Number        // Simulated vibration value
+    temperature: {
+      type: Number,
+      required: false
+    },
+    flowRate: {
+      type: Number,
+      required: false
+    },
+    motorStatus: {
+      type: String, // String allows statuses like "Running", "Stopped", etc.
+      required: false
+    },
+    vibration: {
+      type: Number,
+      required: false
+    }
   }
 });
 
 // Create a model from the schema
-const Reading = mongoose.model('Reading', readingSchema);
+const Livereading = mongoose.model('Livereading', readingSchema);
 
-// Export the model to use in other files
-export default Reading;
-
+// Export the model so it can be used in other files (e.g., opcClient.ts)
+export default Livereading;
