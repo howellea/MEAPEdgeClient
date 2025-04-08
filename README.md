@@ -1,4 +1,4 @@
-# MEAP Edge Client
+# MEAP Edge Client_
 
 > 📡 A lightweight OPC UA edge connector that simulates equipment readings using the Prosys OPC UA Simulation Server and writes them to MongoDB Atlas — part of the MEAP (Maintenance Engineer Assist Platform).
 
