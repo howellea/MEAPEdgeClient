@@ -1,50 +1,57 @@
-// This connects to the Prosys OPC UA server and reads simulated tags.
-// src/services/opcClient.ts
-
-// Import OPC UA client classes
-    // These are all key building blocks from the node-opcua library,__
-    // and each one plays a role in communicating with the OPC UA server.
+// Connects to the Prosys OPC UA Simulator and saves sensor readings to MongoDB
 import {
-    OPCUAClient,
-    AttributeIds,
-    TimestampsToReturn,
-    ClientSession
-  } from 'node-opcua';
-  
-  // Import Mongoose model for saving sensor data
-  import Reading from '../models/readings';
-  
-  // URL for the Prosys OPC UA Simulation Server
-  const endpointUrl = "opc.tcp://eddys-MBP.attlocal.net:53530/OPCUA/SimulationServer";
-  
-  // Function to connect and continuously poll OPC UA tags
-  export const pollOpcUaTags = async () => {
-    // Create a new OPC UA client
-    const client = OPCUAClient.create({ endpoint_must_exist: false });
-  
-    try {
-      // Connect to the OPC UA server
-      await client.connect(endpointUrl);
-  
-      // Create a session for reading data
-      const session: ClientSession = await client.createSession();
-  
-      // Simulated equipment ID for identification in DB
-      const equipmentId = "Pump-101";
-  
-      // Start a loop to poll data every 3 seconds
-      setInterval(async () => {
-        // Read values for each tag from the OPC UA server
+  OPCUAClient,
+  AttributeIds,
+  ClientSession,
+  TimestampsToReturn
+} from 'node-opcua';
+
+
+import dotenv from 'dotenv';
+import Reading from '../models/readings';
+
+dotenv.config();
+
+// Load and validate OPC UA endpoint from .env
+const endpointUrl = process.env.OPCUA_ENDPOINT;
+if (!endpointUrl) {
+  console.error('❌ OPCUA_ENDPOINT is not defined in .env');
+  process.exit(1);
+}
+
+// Main function that connects to the OPC UA server and polls sensor values
+export const pollOpcUaTags = async () => {
+  const client = OPCUAClient.create({ endpoint_must_exist: false });
+
+  try {
+    await client.connect(endpointUrl);
+    console.log(`✅ Connected to OPC UA Server: ${endpointUrl}`);
+
+    const session: ClientSession = await client.createSession();
+    console.log("🔐 OPC UA session created");
+
+    const equipmentId = "Pump-101"; // Identifier for MongoDB
+    const Temperature = "ns=3;i=1009";
+    const FlowRate = "ns=3;i=1010";
+    const MotorStatus = "ns=3;i=1011";
+    const Vibration = "ns=3;i=1012";
+
+    setInterval(async () => {
+      try {
+        // Read live values from the OPC UA tags
         const [temp, flow, motor, vibration] = await Promise.all([
-          session.read({ nodeId: "ns=5;s=Pump1.Temperature", attributeId: AttributeIds.Value }),
-          session.read({ nodeId: "ns=5;s=Pump1.FlowRate", attributeId: AttributeIds.Value }),
-          session.read({ nodeId: "ns=5;s=Pump1.MotorStatus", attributeId: AttributeIds.Value }),
-          session.read({ nodeId: "ns=5;s=Pump1.Vibration", attributeId: AttributeIds.Value })
+          session.read({ nodeId: Temperature, attributeId: AttributeIds.Value }),
+          session.read({ nodeId: FlowRate, attributeId: AttributeIds.Value }),
+          session.read({ nodeId: MotorStatus, attributeId: AttributeIds.Value }),
+          session.read({ nodeId: Vibration, attributeId: AttributeIds.Value })
         ]);
-  
-        // Create a new reading document with the tag values
+
+        console.log(`[📡 Read] Temp=${temp.value.value}, Flow=${flow.value.value}, Motor=${motor.value.value}, Vibration=${vibration.value.value}`);
+
+        // Construct the MongoDB document
         const reading = new Reading({
           equipmentId,
+          timestamp: new Date(),
           tags: {
             temperature: temp.value.value,
             flowRate: flow.value.value,
@@ -52,15 +59,16 @@ import {
             vibration: vibration.value.value
           }
         });
-  
-        // Save the reading to MongoDB Atlas
+
         await reading.save();
-        console.log('✅ Reading saved:', reading);
-  
-      }, 3000); // 3 seconds polling interval
-  
-    } catch (err) {
-      console.error('OPC UA client error:', err);
-    }
-  };
-  
+        console.log('✅ Saved reading to MongoDB');
+
+      } catch (err) {
+        console.error('⚠️ Read or Save Error:', err);
+      }
+    }, 3000); // Run every 3 seconds
+
+  } catch (err) {
+    console.error('❌ OPC UA Connection Error:', err);
+  }
+};
